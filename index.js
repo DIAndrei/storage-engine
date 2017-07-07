@@ -31,25 +31,27 @@ StorageEngine.prototype.loadFromString = function (err, content) {
     }
     this.myState = JSON.parse(content);
     this.fileState = JSON.parse(content);
-    console.log(this.myState, this.fileState);
+    // console.log(this.myState, this.fileState);
 }
 
 StorageEngine.prototype.save = function (callback) {
-    var toWrite = this.myState,
-        inFile = this.fileState;
-    console.log(toWrite, inFile);
+    var inMemory = this.myState,
+        inFile = this.fileState,
+        toWrite = {};
 
-    for (var i in inFile) {
+    // TODO: When calling save method, load method MUST be called first, to load everything from file in memory.
+
+        for(var i in inMemory) {
         if (inFile.hasOwnProperty(i)) {
-            inFile[i] = toWrite[i];
-            console.log(inFile[i], toWrite[i]);
+            toWrite[i] = inMemory[i];
+            console.log(inFile[i], inMemory[i]);
         }
         else {
-            console.log(inFile[i], toWrite[i]);
+            toWrite[i] = inMemory[i];
         }
     }
 
-
+    console.log(inMemory, inFile, toWrite);
 
     fs.writeFile(this.filePath, JSON.stringify(toWrite), function (err) {
         if (err) {
@@ -70,9 +72,9 @@ var storageEngine1 = new StorageEngine('./store/store.txt');
 storageEngine1.set('addddsd', 'dsa', true);
 storageEngine1.set('rtt', 'QUE?', false);
 
-console.log(storageEngine1.get('addddsd'));
-console.log(storageEngine1.get('rtt'));
-console.log(storageEngine1.get('addddsd'));
+// console.log(storageEngine1.get('addddsd'));
+// console.log(storageEngine1.get('rtt'));
+// console.log(storageEngine1.get('addddsd'));
 
 storageEngine1.set('rtt', 'WEQWEQWE', true);
 
