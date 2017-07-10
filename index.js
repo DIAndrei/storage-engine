@@ -32,7 +32,7 @@ StorageEngine.prototype.loadFromString = function (err, content) {
         this.myState = JSON.parse(content);
     }
     else {
-        console.log('Invalid or no file content');
+        console.trace('Invalid or no file content');
         return;
     }
 }
@@ -47,7 +47,7 @@ StorageEngine.prototype.save = function (callback) {
             inFile = JSON.parse(content);
         }
         else {
-            console.log('Invalid or no file content');
+            console.trace('Invalid or no file content');
             return;
         }
 
