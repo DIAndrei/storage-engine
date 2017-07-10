@@ -4,7 +4,6 @@ const fs = require('fs');
 
 function StorageEngine(filePath) {
     this.myState = {};
-    this.fileState = {};
     this.filePath = filePath;
 }
 
@@ -29,36 +28,44 @@ StorageEngine.prototype.loadFromString = function (err, content) {
     if (err) {
         return myCallback(err);
     }
-    this.myState = JSON.parse(content);
-    this.fileState = JSON.parse(content);
-    // console.log(this.myState, this.fileState);
+    if (content) {
+        this.myState = JSON.parse(content);
+    }
+    else {
+        console.log('Invalid or no file content');
+        return;
+    }
 }
 
 StorageEngine.prototype.save = function (callback) {
     var inMemory = this.myState,
-        inFile = this.fileState,
-        toWrite = {};
+        inFile,
+        self = this;
 
-    // TODO: When calling save method, load method MUST be called first, to load everything from file in memory.
-
-        for(var i in inMemory) {
-        if (inFile.hasOwnProperty(i)) {
-            toWrite[i] = inMemory[i];
-            console.log(inFile[i], inMemory[i]);
+    fs.readFile(this.filePath, { encoding: 'utf-8' }, function (err, content) {
+        if (content) {
+            inFile = JSON.parse(content);
         }
         else {
-            toWrite[i] = inMemory[i];
+            console.log('Invalid or no file content');
+            return;
         }
-    }
 
-    console.log(inMemory, inFile, toWrite);
-
-    fs.writeFile(this.filePath, JSON.stringify(toWrite), function (err) {
-        if (err) {
-            return callback(err);
+        for (var i in inMemory) {
+            inFile[i] = inMemory[i];
         }
-        callback();
+
+        // console.log(inMemory, inFile);
+
+        fs.writeFile(self.filePath, JSON.stringify(inFile), function (err) {
+            if (err) {
+                return callback(err);
+            }
+            callback();
+        });
+
     });
+
 }
 
 function myCallback(err) {
@@ -69,15 +76,16 @@ function myCallback(err) {
 
 var storageEngine1 = new StorageEngine('./store/store.txt');
 
-storageEngine1.set('addddsd', 'dsa', true);
-storageEngine1.set('rtt', 'QUE?', false);
-
-// console.log(storageEngine1.get('addddsd'));
-// console.log(storageEngine1.get('rtt'));
-// console.log(storageEngine1.get('addddsd'));
-
-storageEngine1.set('rtt', 'WEQWEQWE', true);
-
+storageEngine1.set('nume', 'Gheorghe', true);
+storageEngine1.set('adresa', 'Strada', false);
+storageEngine1.set('email', 'gheo@gheo.com', true);
+// console.log(storageEngine1.get('nume'));
+// console.log(storageEngine1.get('adresa'));
+// console.log(storageEngine1.get('email'));
+storageEngine1.set('test', 'QPWOEQKIWPQIPIP', true);
+storageEngine1.set('adresa', 'str. Copacului', true);
+storageEngine1.set('cheiecarenuexista', 'laskdj', true);
+storageEngine1.set('asd', 'asd', false);
 // storageEngine1.load(myCallback);
 
 storageEngine1.save(myCallback);
@@ -85,5 +93,5 @@ storageEngine1.save(myCallback);
 
 
 // setTimeout(function () {
-//     console.log(storageEngine1.get('asdasdasd'));
+//     console.log(storageEngine1.get('email'));
 // }, 1000);
